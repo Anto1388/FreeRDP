@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  mongo:
+    image: mongo:7
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+  backend:
+    build: ./apps/backend
+    environment:
+      - PORT=4000
+      - MONGO_URL=mongodb://mongo:27017/yalipa
+    depends_on:
+      - mongo
+    ports:
+      - "4000:4000"
+  ai:
+    build: ./apps/ai
+    environment:
+      - PORT=8000
+    ports:
+      - "8000:8000"
+  frontend:
+    build: ./apps/frontend
+    environment:
+      - NEXT_PUBLIC_API_BASE=http://localhost:4000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+volumes:
+  mongo_data:
